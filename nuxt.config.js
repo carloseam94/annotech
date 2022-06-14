@@ -35,6 +35,7 @@ export default {
   modules: [
     // https://go.nuxtjs.dev/pwa
     '@nuxtjs/pwa',
+    'bootstrap-vue/nuxt'
   ],
 
   // PWA module configuration: https://go.nuxtjs.dev/pwa
@@ -46,5 +47,10 @@ export default {
 
   // Build Configuration: https://go.nuxtjs.dev/config-build
   build: {
+  },
+
+  bootstrapVue: {
+    // Install the `IconsPlugin` plugin (in addition to `BootstrapVue` plugin)
+    icons: true
   }
 }
