@@ -41,7 +41,14 @@ export default {
   // PWA module configuration: https://go.nuxtjs.dev/pwa
   pwa: {
     manifest: {
-      lang: 'en'
+      lang: 'en',
+      name: "AnnoTech",
+      short_name: "AnnoTech",
+      description: "Annotations on texts and documents.",
+      theme_color: "#222"
+    },
+    icon: {
+      fileName: "app-icon.png"
     }
   },
 
