@@ -9,7 +9,7 @@
           :state="Boolean(fileText)"
           @change="changeUploadedFileText"
           accept="text/plain"
-          placeholder="Choose a file (.txt) or drop it here..."
+          placeholder="Choose a text file (.txt, .html, .json, etc) or drop it here..."
           drop-placeholder="Drop file here..."
         ></b-form-file>
       </b-col>
