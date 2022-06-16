@@ -14,12 +14,31 @@
     </b-row>
     <b-row class="mt-3">
       <b-col>
-        <b-button variant="dark" :disabled="!file" @click="buildAndExportJSON">Export JSON</b-button>
+        <b-button variant="primary" size="sm" :disabled="showingTextArea" @click="showTextArea">Enter text manually</b-button>
+      </b-col>
+      <b-col class="text-right">
+        <b-button variant="primary" size="sm" :disabled="!text || showingTextArea" @click="buildAndExportJSON">Export JSON</b-button>
       </b-col>
     </b-row>
     <b-row class="my-5">
       <b-col>
-        <div id="annotator-box">{{ text }}</div>
+        <div v-show="!showingTextArea">
+          <div id="annotator-box">{{ text }}</div>
+        </div>
+        <div v-show="showingTextArea">
+          <b-form-textarea
+            id="textarea"
+            v-model="text"
+            placeholder="Enter something..."
+            rows="10"
+            max-rows="20">
+          </b-form-textarea>
+          <b-row>
+            <b-col class="text-right">
+              <b-button class="mt-3" variant="primary" size="sm" :disabled="!text" @click="initializeAnnotator">Done</b-button>
+            </b-col>
+          </b-row>
+        </div>
       </b-col>
     </b-row>
   </div>
@@ -34,6 +53,7 @@ export default {
       annotator: null,
       text: "",
       file: null,
+      showingTextArea: false
     };
   },
   methods: {
@@ -61,20 +81,21 @@ export default {
       });
     },
     destroyAnnotator() {
-      this.annotator.destroy();
-      document.getElementById("annotator-box").innerText = "";
-      this.text = null;
-      this.annotator = null;
+      if(this.annotator) {
+        this.annotator.destroy();
+        document.getElementById("annotator-box").innerText = "";
+        this.text = null;
+        this.annotator = null;
+      }
     },
     initializeAnnotator() {
+      this.hideTextArea();
       document.getElementById("annotator-box").innerText = this.text;
       this.annotator = this.getNewRecogito();
     },
     changeUploadedFile(event) {
       if (event.target.files[0]) {
-        if(this.annotator) {
-          this.destroyAnnotator();
-        }
+        this.destroyAnnotator();
         var reader = new FileReader();
         reader.readAsText(event.target.files[0]);
         reader.onload = () => {
@@ -85,6 +106,17 @@ export default {
         this.destroyAnnotator();
       }
     },
+    showTextArea() {
+      this.destroyAnnotator();
+      this.file = null;
+      this.showingTextArea = true;
+      this.$nextTick(() => {
+        document.getElementById("textarea").focus();
+      })
+    },
+    hideTextArea() {
+      this.showingTextArea = false;
+    }
   },
   mounted() {
     this.recogito = require("@recogito/recogito-js");
@@ -95,5 +127,9 @@ export default {
 @import url("@recogito/recogito-js/dist/recogito.min.css");
 #annotator-box {
   white-space: pre-wrap;
+}
+
+.custom-file-label {
+  cursor: pointer;
 }
 </style>
