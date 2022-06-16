@@ -1,6 +1,6 @@
 <template>
   <div class="annotator-region">
-    <b-row>
+    <b-row class="mt-5">
       <b-col>
         <b-form-file
           v-model="file"
@@ -12,14 +12,14 @@
         ></b-form-file>
       </b-col>
     </b-row>
-    <b-row>
+    <b-row class="mt-3">
       <b-col>
-        <div id="annotator-box">{{ text }}</div>
+        <b-button variant="dark" :disabled="!file" @click="buildAndExportJSON">Export JSON</b-button>
       </b-col>
     </b-row>
-    <b-row>
-      <b-col class="text-right mt-3">
-        <b-button variant="dark" @click="buildAndExportJSON">Export JSON</b-button>
+    <b-row class="my-5">
+      <b-col>
+        <div id="annotator-box">{{ text }}</div>
       </b-col>
     </b-row>
   </div>
@@ -31,15 +31,16 @@ export default {
   data() {
     return {
       recogito: null,
+      annotator: null,
       text: "",
-      file: null
+      file: null,
     };
   },
   methods: {
     buildJSON() {
       return {
         originalText: this.text,
-        annotations: this.recogito.getAnnotations(),
+        annotations: this.annotator.getAnnotations(),
       };
     },
     buildAndExportJSON() {
@@ -47,35 +48,46 @@ export default {
       this.exportJSON(JSON.stringify(json), "annotations");
     },
     exportJSON(content, filename) {
-        Downloader.downloadBlob(content, filename + '.json', "application/json;charset=utf-8;");
-    },
-    exportCSV(content, filename) {
-        utils.downloadBlob(content, fileName + '.csv', "text/csv;charset=utf-8;");
+      Downloader.downloadBlob(
+        content,
+        filename + ".json",
+        "application/json;charset=utf-8;"
+      );
     },
     getNewRecogito() {
-      const Recogito = require("@recogito/recogito-js");
-      return Recogito.init({
+      return this.recogito.init({
         content: document.getElementById("annotator-box"),
+        mode: "pre",
       });
     },
-    // setRecogitoEvents(r) {
-    //   r.on("createAnnotation", function (annotation) {
-    //     console.log(annotation);
-    //   });
-    // },
+    destroyAnnotator() {
+      this.annotator.destroy();
+      document.getElementById("annotator-box").innerText = "";
+      this.text = null;
+      this.annotator = null;
+    },
+    initializeAnnotator() {
+      document.getElementById("annotator-box").innerText = this.text;
+      this.annotator = this.getNewRecogito();
+    },
     changeUploadedFile(event) {
+      if (event.target.files[0]) {
+        if(this.annotator) {
+          this.destroyAnnotator();
+        }
         var reader = new FileReader();
         reader.readAsText(event.target.files[0]);
         reader.onload = () => {
           this.text = reader.result;
-          console.log(this.text);
-          this.recogito = this.getNewRecogito();
+          this.initializeAnnotator();
         };
-    }
+      } else {
+        this.destroyAnnotator();
+      }
+    },
   },
   mounted() {
-    // this.recogito = this.getNewRecogito();
-    // this.setRecogitoEvents(this.recogito);
+    this.recogito = require("@recogito/recogito-js");
   },
 };
 </script>
