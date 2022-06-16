@@ -8,8 +8,8 @@
           v-model="fileText"
           :state="Boolean(fileText)"
           @change="changeUploadedFileText"
-          accept="text/plain"
-          placeholder="Choose a text file (.txt, .html, .json, etc) or drop it here..."
+          accept=".txt,.html,.json"
+          placeholder="Choose a text file (.txt, .html, .json) or drop it here..."
           drop-placeholder="Drop file here..."
         ></b-form-file>
       </b-col>
@@ -220,11 +220,13 @@ export default {
     * @return {void} void
     */
     changeUploadedFileText(event) {
-      if (event.target.files[0]) {
+      // case1: browse, case2: drag and drop
+      var file = event.target.files ? event.target.files[0] : event.dataTransfer.files[0];
+      if (file) {
         this.fileJSON = null;
         this.destroyAnnotator();
         var reader = new FileReader();
-        reader.readAsText(event.target.files[0]);
+        reader.readAsText(file);
         reader.onload = () => {
           this.initializeAnnotator(reader.result);
         };
@@ -241,11 +243,13 @@ export default {
     * @return {void} void
     */
     changeUploadedFileJSON(event) {
-      if (event.target.files[0]) {
+      // case1: browse, case2: drag and drop
+      var file = event.target.files ? event.target.files[0] : event.dataTransfer.files[0];
+      if (file) {
         this.fileText = null;
         this.destroyAnnotator();
         var reader = new FileReader();
-        reader.readAsText(event.target.files[0]);
+        reader.readAsText(file);
         reader.onload = () => {
           this.loadAnnotator(JSON.parse(reader.result));
         };
