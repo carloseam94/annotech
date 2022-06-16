@@ -59,9 +59,10 @@
             rows="10"
             max-rows="20">
           </b-form-textarea>
-          <b-row>
+          <b-row class="mt-3">
             <b-col class="text-right">
-              <b-button class="mt-3" variant="primary" size="sm" :disabled="!text" @click="initializeAnnotator(text)">Done</b-button>
+              <b-button class="mr-2" variant="secondary" size="sm" @click="hideTextArea">Cancel</b-button>
+              <b-button variant="primary" size="sm" :disabled="!text" @click="initializeAnnotator(text)">Done</b-button>
             </b-col>
           </b-row>
         </div>
@@ -124,6 +125,7 @@ export default {
       this.annotator = this.getNewRecogito();
     },
     loadAnnotator(json) {
+      console.log(json)
       this.hideTextArea();
       this.text = json.originalText;
       document.getElementById("annotator-box").innerText = json.originalText;
@@ -169,6 +171,7 @@ export default {
       })
     },
     hideTextArea() {
+      this.text = null;
       this.showingTextArea = false;
     }
   },
