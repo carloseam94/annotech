@@ -1,6 +1,6 @@
 <template>
   <div class="annotator-region">
-    <b-row class="mt-3">
+    <b-row class="mt-4">
       <b-col>
         <label for="form-file-text">Import text:</label>
         <b-form-file
@@ -14,7 +14,7 @@
         ></b-form-file>
       </b-col>
     </b-row>
-    <b-row class="mt-3">
+    <b-row class="mt-4">
       <b-col>
         <label for="form-file-json">Import text with annotations:</label>
         <b-form-file
@@ -28,18 +28,26 @@
         ></b-form-file>
       </b-col>
     </b-row>
-    <b-row class="mt-3">
+    <b-row class="mt-4">
       <b-col>
         <b-button variant="primary" size="sm" :disabled="showingTextArea" @click="showTextArea">Enter text manually</b-button>
       </b-col>
     </b-row>
-    <b-row class="my-5">
+    <b-row class="my-4">
       <b-col>
         <div v-show="!showingTextArea">
           <div id="annotator-box">{{ text }}</div>
           <b-row v-show="text && !showingTextArea" class="mt-5">
             <b-col class="text-right">
-              <b-button variant="primary" size="sm" @click="buildAndExportJSON">Export JSON</b-button>
+              <b-input-group
+                :size="'sm'"
+                class="mb-3 d-inline-flex"
+                >
+                <b-form-input placeholder="filename..." id="export-filename-input"></b-form-input>
+                <b-input-group-append>
+                  <b-button variant="primary" size="sm" @click="buildAndExportJSON">Export JSON</b-button>
+                </b-input-group-append>
+              </b-input-group>  
             </b-col>
           </b-row>
         </div>
@@ -53,7 +61,7 @@
           </b-form-textarea>
           <b-row>
             <b-col class="text-right">
-              <b-button class="mt-3" variant="primary" size="sm" :disabled="!text" @click="initializeAnnotator">Done</b-button>
+              <b-button class="mt-3" variant="primary" size="sm" :disabled="!text" @click="initializeAnnotator(text)">Done</b-button>
             </b-col>
           </b-row>
         </div>
@@ -84,7 +92,8 @@ export default {
     },
     buildAndExportJSON() {
       const json = this.buildJSON();
-      this.exportJSON(JSON.stringify(json), "annotations");
+      var filename = document.getElementById("export-filename-input").value;
+      this.exportJSON(JSON.stringify(json), !filename || filename == "" ? "annotations" : filename);
     },
     exportJSON(content, filename) {
       Downloader.downloadBlob(
@@ -92,9 +101,6 @@ export default {
         filename + ".json",
         "application/json;charset=utf-8;"
       );
-    },
-    importJSON() {
-
     },
     getNewRecogito() {
       return this.recogito.init({
@@ -110,19 +116,31 @@ export default {
         this.annotator = null;
       }
     },
-    initializeAnnotator() {
+    initializeAnnotator(text) {
       this.hideTextArea();
-      document.getElementById("annotator-box").innerText = this.text;
+      this.text = text;
+      document.getElementById("annotator-box").innerText = text;
+      document.getElementById("export-filename-input").value = "";
       this.annotator = this.getNewRecogito();
+    },
+    loadAnnotator(json) {
+      this.hideTextArea();
+      this.text = json.originalText;
+      document.getElementById("annotator-box").innerText = json.originalText;
+      document.getElementById("export-filename-input").value = "";
+      this.annotator = this.getNewRecogito();
+      json.annotations.forEach(ann => {
+        this.annotator.addAnnotation(ann);
+      });
     },
     changeUploadedFileText(event) {
       if (event.target.files[0]) {
+        this.fileJSON = null;
         this.destroyAnnotator();
         var reader = new FileReader();
         reader.readAsText(event.target.files[0]);
         reader.onload = () => {
-          this.text = reader.result;
-          this.initializeAnnotator();
+          this.initializeAnnotator(reader.result);
         };
       } else {
         this.destroyAnnotator();
@@ -130,12 +148,12 @@ export default {
     },
     changeUploadedFileJSON(event) {
       if (event.target.files[0]) {
+        this.fileText = null;
         this.destroyAnnotator();
         var reader = new FileReader();
         reader.readAsText(event.target.files[0]);
         reader.onload = () => {
-          this.text = reader.result;
-          this.initializeAnnotator();
+          this.loadAnnotator(JSON.parse(reader.result));
         };
       } else {
         this.destroyAnnotator();
@@ -143,7 +161,8 @@ export default {
     },
     showTextArea() {
       this.destroyAnnotator();
-      this.file = null;
+      this.fileText = null;
+      this.fileJSON = null;
       this.showingTextArea = true;
       this.$nextTick(() => {
         document.getElementById("textarea").focus();
@@ -160,6 +179,7 @@ export default {
 </script>
 <style>
 @import url("@recogito/recogito-js/dist/recogito.min.css");
+
 #annotator-box {
   white-space: pre-wrap;
 }
@@ -170,5 +190,9 @@ export default {
 
 .custom-file-input ~ .custom-file-label[data-browse]::after {
     display: none;
+}
+
+.input-group-sm {
+  width: 345px;
 }
 </style>
