@@ -20,7 +20,7 @@ export default {
       {
         hid: "twitter:url",
         name: "twitter:url",
-        content: "https://annotech.netlify.app/"
+        content: "https://annotech.vercel.app/"
       },
       {
         hid: "twitter:title",
@@ -35,7 +35,7 @@ export default {
       {
         hid: "twitter:image",
         name: "twitter:image",
-        content: "https://annotech.netlify.app/social-media.png"
+        content: "https://annotech.vercel.app/social-media.png"
       },
 
       // Open Graph
@@ -49,7 +49,7 @@ export default {
       {
         hid: "og:url",
         property: "og:url",
-        content: "https://annotech.netlify.app/"
+        content: "https://annotech.vercel.app/"
       },
       {
         hid: "og:title",
@@ -64,12 +64,12 @@ export default {
       {
         hid: "og:image",
         property: "og:image",
-        content: "https://annotech.netlify.app/social-media.png"
+        content: "https://annotech.vercel.app/social-media.png"
       },
       {
         hid: "og:image:secure_url",
         property: "og:image:secure_url",
-        content: "https://annotech.netlify.app/social-media.png"
+        content: "https://annotech.vercel.app/social-media.png"
       },
       {
         hid: "og:image:alt",
