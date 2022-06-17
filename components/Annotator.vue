@@ -318,7 +318,6 @@ export default {
     box-shadow: 0 0 0 0.2rem rgb(5 108 222 / 25%);
 }
 
-
 .input-group-sm {
   width: 345px;
 }
